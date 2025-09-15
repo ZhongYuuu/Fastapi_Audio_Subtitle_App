@@ -1,0 +1,44 @@
+/* 原有样式 + 新增登录/注册页面样式 */
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+nav {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+#fileList {
+    min-width: 200px;
+    max-height: 80vh;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 4px;
+}
+/* ... 原有其余样式 ... */
+
+/* 登录/注册页面样式 */
+.auth-container {
+    max-width: 300px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.auth-container div {
+    margin-bottom: 15px;
+}
+.auth-container input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+}
+.error {
+    color: red;
+    margin-bottom: 15px;
+}

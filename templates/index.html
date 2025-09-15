@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title></title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-light: #eff6ff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --background: #ffffff;
+            --surface: #f8fafc;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--surface);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-bottom: 70px;
+        }
+        
+        /* 导航栏 */
+        nav {
+            background-color: var(--background);
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        nav h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            letter-spacing: -0.02em;
+        }
+        
+        nav .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        nav span {
+            font-size: 0.85rem;
+        }
+        
+        /* 语言切换Tab栏 */
+        .language-tabs {
+            display: flex;
+            background-color: var(--background);
+            border-bottom: 1px solid var(--border);
+            padding-left: 0.5rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .language-tab {
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .language-tab:hover {
+            color: var(--primary);
+        }
+        
+        .language-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        /* 主容器布局 */
+        .container {
+            display: flex;
+            flex-direction: column;
+            max-width: 1400px;
+            margin: 0 auto;
+            gap: 1rem;
+            padding: 0 0.8rem 1rem;
+        }
+        
+        /* 左侧文件列表 - 移动端优先 */
+        #fileList {
+            width: 100%;
+            background-color: var(--background);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1rem;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+        
+        #fileList h3 {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+        }
+        
+        #fileListItems {
+            list-style: none;
+        }
+        
+        #fileListItems li {
+            padding: 0.6rem 0.8rem;
+            cursor: pointer;
+            border-radius: var(--radius);
+            margin-bottom: 0.4rem;
+            transition: all 0.15s ease;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        #fileListItems li:hover {
+            background-color: var(--surface);
+            color: var(--text-primary);
+        }
+        
+        #fileListItems li.selected {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        /* 中间文章区域 */
+        #playerContainer {
+            flex: 1;
+            background-color: var(--background);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.2rem;
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+        }
+        
+        #playerContainer h3 {
+            font-size: clamp(1.1rem, 5vw, 1.3rem);
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+        }
+        
+        /* 底部音频控件 */
+        #bottomAudioControls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 0.75rem;
+            z-index: 90;
+            display: flex;
+            justify-content: center;
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(4px);
+        }
+        
+        #bottomAudioControls audio {
+            width: 100%;
+            max-width: 100%;
+            border-radius: var(--radius);
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            transition: all 0.2s ease;
+        }
+        
+        /* 文章阅读区域 - 核心适配：自动缩放字体 */
+        #text {
+            /* 关键：使用clamp实现字体自动缩放，最小1rem，最大1.15rem，基于屏幕宽度 */
+            font-size: clamp(1rem, 4vw, 1.15rem);
+            line-height: 1.8;
+            color: var(--text-primary);
+            letter-spacing: 0.01em;
+            word-spacing: 0.03em;
+            width: 100%;
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 0.5rem 0;
+            text-align: justify;
+            text-justify: inter-character;
+            text-indent: 2em;
+        }
+
+        .sentence {
+            display: inline;
+            cursor: pointer;
+            position: relative;
+            padding: 0 2px;
+            border-radius: 4px;
+            transition: all 0.15s ease;
+        }
+
+        .sentence:hover {
+            background-color: var(--primary-light);
+            padding: 0 3px;
+        }
+
+        .sentence.highlight {
+            background-color: var(--primary);
+            color: white;
+            padding: 2px 4px;
+            border-radius: 4px;
+            animation: pulse 2s infinite;
+            margin: 0 1px;
+        }
+
+        .loading {
+            color: var(--text-secondary);
+            font-style: italic;
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.3);
+            }
+            70% {
+                box-shadow: 0 0 0 4px rgba(59, 130, 246, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
+        }
+        
+        /* 滚动条优化 */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* 平板/桌面端适配 */
+        @media (min-width: 768px) {
+            .container {
+                flex-direction: row;
+                padding: 0 1.5rem 1.5rem;
+                gap: 1.5rem;
+            }
+            
+            #fileList {
+                flex: 0 0 260px;
+                max-height: calc(100vh - 180px);
+                padding: 1.25rem;
+            }
+            
+            #playerContainer {
+                padding: 2rem;
+                max-height: calc(100vh - 180px);
+            }
+            
+            #bottomAudioControls audio {
+                max-width: calc(1400px - 240px - 3rem);
+            }
+        }
+
+        /* 大屏桌面端 */
+        @media (min-width: 1200px) {
+            #text {
+                font-size: 1.15rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 语言切换Tab栏 -->
+    <div class="language-tabs">
+        <div class="language-tab active" data-lang="english">Headline News</div>
+        <div class="language-tab" data-lang="german">Old Headline News</div>
+        <div class="language-tab" data-lang="french">F</div>
+        <div class="language-tab" data-lang="spanish">S</div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 左侧文件列表 -->
+        <div id="fileList">
+            <h3></h3>
+            <ul id="fileListItems"></ul>
+        </div>
+        
+        <!-- 中间文章区域 -->
+        <div id="playerContainer">
+            <h3 id="articleTitle">请选择一篇文章开始播放...</h3>
+            <div id="text" class="loading"></div>
+        </div>
+    </div>
+
+    <!-- 底部音频控件 -->
+    <div id="bottomAudioControls">
+        <audio id="audio" controls></audio>
+    </div>
+
+    <script>
+        // 原有JavaScript逻辑保持不变
+        const fileListEl = document.getElementById('fileListItems');
+        const audioEl = document.getElementById('audio');
+        const textEl = document.getElementById('text');
+        const articleTitleEl = document.getElementById('articleTitle');
+        const languageTabs = document.querySelectorAll('.language-tab');
+        let currentSentences = [];
+        let currentSelectedFile = null;
+        let currentLanguage = 'english'; // 默认语言
+        const DOUBLE_CLICK_DELAY = 250;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const langFromUrl = urlParams.get('lang');
+            if (langFromUrl && ['english', 'german', 'french', 'spanish'].includes(langFromUrl)) {
+                currentLanguage = langFromUrl;
+                updateActiveTab(currentLanguage);
+            }
+            
+            loadLanguageFiles(currentLanguage);
+            
+            languageTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const lang = tab.dataset.lang;
+                    if (lang !== currentLanguage) {
+                        currentLanguage = lang;
+                        updateActiveTab(lang);
+                        loadLanguageFiles(lang);
+                    }
+                });
+            });
+        });
+
+        function updateActiveTab(lang) {
+            languageTabs.forEach(tab => {
+                if (tab.dataset.lang === lang) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+        }
+
+        function loadLanguageFiles(lang) {
+            fileListEl.innerHTML = '<li class="loading">加载中...</li>';
+            
+            fetch(`/files?lang=${lang}`)
+                .then(res => res.json())
+                .then(data => {
+                    fileListEl.innerHTML = '';
+                    
+                    if (data.files.length === 0) {
+                        fileListEl.innerHTML = '<li class="loading">没有找到该语言的文件</li>';
+                        return;
+                    }
+                    
+                    data.files.forEach((name, index) => {
+                        const li = document.createElement('li');
+                        li.textContent = `${index + 1}. ${name}`;
+                        li.addEventListener('click', () => selectFile(name, li));
+                        fileListEl.appendChild(li);
+                    });
+                    
+                    if (data.files.length > 0) {
+                        const firstLi = fileListEl.querySelector('li');
+                        if (firstLi) {
+                            selectFile(data.files[0], firstLi);
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('获取文件列表失败:', err);
+                    fileListEl.innerHTML = '<li class="loading" style="color: #ef4444;">加载文件列表失败</li>';
+                });
+        }
+
+        function selectFile(name, element) {
+            if (currentSelectedFile) {
+                currentSelectedFile.classList.remove('selected');
+            }
+            element.classList.add('selected');
+            currentSelectedFile = element;
+            
+            const articleTitle = name.replace(/\.[^/.]+$/, "");
+            articleTitleEl.textContent = articleTitle;
+            
+            loadFile(name);
+        }
+
+        function loadFile(name) {
+            textEl.innerHTML = '<div class="loading">正在加载...</div>';
+            audioEl.pause();
+            
+            const audioUrl = `/audio/${currentLanguage}/${name}`;
+            audioEl.src = audioUrl;
+            
+            fetch(`/subtitle/${currentLanguage}/${name}`)
+                .then(res => res.json())
+                .then(sentences => {
+                    currentSentences = sentences;
+                    renderSubtitles(sentences);
+                    audioEl.load();
+                })
+                .catch(err => {
+                    console.error('加载字幕失败:', err);
+                    textEl.innerHTML = '<div class="loading" style="color: #ef4444;">加载内容失败</div>';
+                });
+        }
+
+        function renderSubtitles(sentences) {
+            textEl.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+            
+            sentences.forEach(sentence => {
+                const span = document.createElement('span');
+                span.textContent = sentence.text + ' ';
+                span.className = 'sentence';
+                span.dataset.start = sentence.start;
+                span.dataset.end = sentence.end;
+
+                let lastClickTime = 0;
+                let clickTimer = null;
+
+                span.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    
+                    const now = Date.now();
+                    const timeSinceLastClick = now - lastClickTime;
+                    lastClickTime = now;
+                    
+                    if (timeSinceLastClick < DOUBLE_CLICK_DELAY && timeSinceLastClick > 0) {
+                        clearTimeout(clickTimer);
+                        e.preventDefault();
+                        audioEl.pause();
+                        return;
+                    }
+                    
+                    clickTimer = setTimeout(() => {
+                        const startTime = parseFloat(span.dataset.start);
+                        if (!isNaN(startTime)) {
+                            audioEl.currentTime = startTime;
+                            audioEl.play().catch(err => {
+                                console.log('需要用户交互才能播放:', err);
+                            });
+                            highlightCurrentSentence(startTime);
+                        }
+                    }, DOUBLE_CLICK_DELAY);
+                });
+                
+                fragment.appendChild(span);
+            });
+            
+            textEl.appendChild(fragment);
+        }
+
+        function highlightCurrentSentence(time) {
+            document.querySelectorAll('.sentence').forEach(span => {
+                span.classList.remove('highlight');
+            });
+            
+            currentSentences.forEach((sentence, i) => {
+                if (time >= sentence.start && time < sentence.end) {
+                    const spans = document.querySelectorAll('.sentence');
+                    if (spans[i]) {
+                        spans[i].classList.add('highlight');
+                        
+                        const rect = spans[i].getBoundingClientRect();
+                        if (rect.top < 100 || rect.bottom > window.innerHeight - 150) {
+                            spans[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+                }
+            });
+        }
+
+        audioEl.addEventListener('timeupdate', () => {
+            highlightCurrentSentence(audioEl.currentTime);
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && document.activeElement.tagName !== 'INPUT') {
+                e.preventDefault();
+                if (audioEl.src) {
+                    if (audioEl.paused) {
+                        audioEl.play().catch(err => {
+                            console.log('需要用户交互才能播放:', err);
+                        });
+                    } else {
+                        audioEl.pause();
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
