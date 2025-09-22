@@ -4,8 +4,6 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
-from sqlalchemy.orm import Session
-from db import get_db, User, pwd_context
 from pathlib import Path
 import os
 import re
@@ -28,10 +26,7 @@ templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 # 服务端文件路径（支持多语言）
 LANGUAGE_DIR = {
-    "english": os.path.join(BASE_DIR, "assets", "english"),
-    "german": os.path.join(BASE_DIR, "assets", "german"),
-    "french": os.path.join(BASE_DIR, "assets", "french"),
-    "spanish": os.path.join(BASE_DIR, "assets", "spanish")
+    "english": os.path.join(BASE_DIR, "assets", "english")
 }
 
 # CORS配置
@@ -46,28 +41,12 @@ app.add_middleware(
 # ------------ 新增主页路由 ------------
 @app.get("/", response_class=HTMLResponse)
 def home_page(request: Request):
-    return templates.TemplateResponse("home.html", {
+    return templates.TemplateResponse("index.html", {
         "request": request
     })
 
-from pydantic import BaseModel
-
-class PasswordVerify(BaseModel):
-    password: str
-
-@app.post("/verify_password")
-async def verify_password(password_data: PasswordVerify, request: Request):
-    if password_data.password == "12345":
-        request.session["password_verified"] = "true"
-        return {"status": "success"}
-    return {"status": "error"}
-
 @app.get("/index", response_class=HTMLResponse)
 def index_page(request: Request):
-    # 检查密码验证状态
-    if request.session.get("password_verified") != "true":
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    
     user = request.session.get("user")
     return templates.TemplateResponse("index.html", {
         "request": request,
@@ -79,10 +58,6 @@ def index_page(request: Request):
 def list_files(lang: str = "english"):
     """获取特定语言的文件列表"""
     lang_dir = LANGUAGE_DIR.get(lang)
-    print(lang_dir)
-    if not lang_dir or not os.path.exists(lang_dir):
-        return {"files": []}
-    
     files = os.listdir(lang_dir)
     mp3_files = [f for f in files if f.endswith(".mp3")]
     return {"files": [os.path.splitext(f)[0] for f in mp3_files]}
@@ -104,9 +79,6 @@ def get_subtitle(lang: str, name: str):
     # 根据语言选择合适的NLP模型
     nlp_model = {
         "english": "",  # en_core_web_sm
-        "german": "",   # de_core_news_sm
-        "french": "",   # fr_core_news_sm
-        "spanish": ""   # es_core_news_sm
     }.get(lang, "en_core_web_sm")
     
     return parse_srt_with_ai(srt_content, nlp_model)

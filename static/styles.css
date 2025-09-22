@@ -1,0 +1,306 @@
+:root {
+    --primary: #3b82f6;
+    --primary-light: #eff6ff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --background: #ffffff;
+    --surface: #f8fafc;
+    --border: #e2e8f0;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --radius: 8px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--surface);
+    color: var(--text-primary);
+    line-height: 1.6;
+    padding-bottom: 70px;
+}
+
+/* 导航栏 */
+nav {
+    background-color: var(--background);
+    padding: 1rem;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav h1 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary);
+    letter-spacing: -0.02em;
+}
+
+nav .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+nav a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+}
+
+nav a:hover {
+    color: var(--primary);
+}
+
+nav span {
+    font-size: 0.85rem;
+}
+
+/* 语言切换Tab栏 */
+.language-tabs {
+    display: flex;
+    background-color: var(--background);
+    border-bottom: 1px solid var(--border);
+    padding-left: 0.5rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.language-tab {
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.language-tab:hover {
+    color: var(--primary);
+}
+
+.language-tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+/* 主容器布局 */
+.container {
+    display: flex;
+    flex-direction: column;
+    max-width: 1400px;
+    margin: 0 auto;
+    gap: 1rem;
+    padding: 0 0.8rem 1rem;
+}
+
+/* 左侧文件列表 - 移动端优先 */
+#fileList {
+    width: 100%;
+    background-color: var(--background);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1rem;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+#fileList h3 {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+}
+
+#fileListItems {
+    list-style: none;
+}
+
+#fileListItems li {
+    padding: 0.6rem 0.8rem;
+    cursor: pointer;
+    border-radius: var(--radius);
+    margin-bottom: 0.4rem;
+    transition: all 0.15s ease;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+#fileListItems li:hover {
+    background-color: var(--surface);
+    color: var(--text-primary);
+}
+
+#fileListItems li.selected {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    font-weight: 500;
+}
+
+/* 中间文章区域 */
+#playerContainer {
+    flex: 1;
+    background-color: var(--background);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.2rem;
+    max-height: calc(100vh - 300px);
+    overflow-y: auto;
+}
+
+#playerContainer h3 {
+    font-size: clamp(1.1rem, 5vw, 1.3rem);
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+}
+
+/* 底部音频控件 */
+#bottomAudioControls {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 0.75rem;
+    z-index: 90;
+    display: flex;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(4px);
+}
+
+#bottomAudioControls audio {
+    width: 100%;
+    max-width: 100%;
+    border-radius: var(--radius);
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 1px solid var(--border);
+    padding: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+/* 文章阅读区域 - 核心适配：自动缩放字体 */
+#text {
+    /* 关键：使用clamp实现字体自动缩放，最小1rem，最大1.15rem，基于屏幕宽度 */
+    font-size: clamp(1rem, 4vw, 1.15rem);
+    line-height: 1.8;
+    color: var(--text-primary);
+    letter-spacing: 0.01em;
+    word-spacing: 0.03em;
+    width: 100%;
+    max-width: 750px;
+    margin: 0 auto;
+    padding: 0.5rem 0;
+    text-align: justify;
+    text-justify: inter-character;
+    text-indent: 2em;
+}
+
+.sentence {
+    display: inline;
+    cursor: pointer;
+    position: relative;
+    padding: 0 2px;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+}
+
+.sentence:hover {
+    background-color: var(--primary-light);
+    padding: 0 3px;
+}
+
+.sentence.highlight {
+    background-color: var(--primary);
+    color: white;
+    padding: 2px 4px;
+    border-radius: 4px;
+    animation: pulse 2s infinite;
+    margin: 0 1px;
+}
+
+.loading {
+    color: var(--text-secondary);
+    font-style: italic;
+    text-align: center;
+    padding: 2rem 0;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.3);
+    }
+    70% {
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    }
+}
+
+/* 滚动条优化 */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* 平板/桌面端适配 */
+@media (min-width: 768px) {
+    .container {
+        flex-direction: row;
+        padding: 0 1.5rem 1.5rem;
+        gap: 1.5rem;
+    }
+    
+    #fileList {
+        flex: 0 0 260px;
+        max-height: calc(100vh - 180px);
+        padding: 1.25rem;
+    }
+    
+    #playerContainer {
+        padding: 2rem;
+        max-height: calc(100vh - 180px);
+    }
+    
+    #bottomAudioControls audio {
+        max-width: calc(1400px - 240px - 3rem);
+    }
+}
+
+/* 大屏桌面端 */
+@media (min-width: 1200px) {
+    #text {
+        font-size: 1.15rem;
+    }
+}

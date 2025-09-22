@@ -1,7 +1,3 @@
 # 忽略所有 __pycache__ 目录及其中的文件
 __pycache__/
 .venv/
-assets/english/
-assets/french/
-assets/german/
-assets/spanish/
