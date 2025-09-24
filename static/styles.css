@@ -1,3 +1,8 @@
+/*******************************
+ * CSS VARIABLES & RESET
+ *******************************/
+
+/* CSS Custom Properties (Variables) */
 :root {
     --primary: #3b82f6;
     --primary-light: #eff6ff;
@@ -10,6 +15,7 @@
     --radius: 8px;
 }
 
+/* Global Reset & Base Styles */
 * {
     margin: 0;
     padding: 0;
@@ -21,10 +27,27 @@ body {
     background-color: var(--surface);
     color: var(--text-primary);
     line-height: 1.6;
-    padding-bottom: 70px;
 }
 
-/* 导航栏 */
+/*******************************
+ * LAYOUT & CONTAINERS
+ *******************************/
+
+/* Main Container */
+.container {
+    display: flex;
+    flex-direction: column;
+    max-width: 1400px;
+    margin: 0 auto;
+    gap: 1rem;
+    padding: 0 0.5rem;
+}
+
+/*******************************
+ * NAVIGATION COMPONENTS
+ *******************************/
+
+/* Navigation Bar */
 nav {
     background-color: var(--background);
     padding: 1rem;
@@ -41,7 +64,6 @@ nav h1 {
     font-size: 1.1rem;
     font-weight: 600;
     color: var(--primary);
-    letter-spacing: -0.02em;
 }
 
 nav .nav-links {
@@ -66,7 +88,7 @@ nav span {
     font-size: 0.85rem;
 }
 
-/* 语言切换Tab栏 */
+/* Language Tabs */
 .language-tabs {
     display: flex;
     background-color: var(--background);
@@ -96,17 +118,11 @@ nav span {
     border-bottom-color: var(--primary);
 }
 
-/* 主容器布局 */
-.container {
-    display: flex;
-    flex-direction: column;
-    max-width: 1400px;
-    margin: 0 auto;
-    gap: 1rem;
-    padding: 0 0.8rem 1rem;
-}
+/*******************************
+ * FILE LIST SIDEBAR
+ *******************************/
 
-/* 左侧文件列表 - 移动端优先 */
+/* File List Container */
 #fileList {
     width: 100%;
     background-color: var(--background);
@@ -115,6 +131,13 @@ nav span {
     padding: 1rem;
     max-height: 180px;
     overflow-y: auto;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+#fileList.hidden {
+    transform: translateX(-100%);
+    opacity: 0;
+    pointer-events: none;
 }
 
 #fileList h3 {
@@ -126,6 +149,7 @@ nav span {
     font-weight: 600;
 }
 
+/* File List Items */
 #fileListItems {
     list-style: none;
 }
@@ -151,54 +175,37 @@ nav span {
     font-weight: 500;
 }
 
-/* 中间文章区域 */
+/*******************************
+ * MAIN CONTENT AREA
+ *******************************/
+
+/* Player Container */
 #playerContainer {
     flex: 1;
     background-color: var(--background);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     padding: 1.2rem;
-    max-height: calc(100vh - 300px);
+    max-height: calc(100vh - 80px);
     overflow-y: auto;
+    margin-left: 0;
+    transition: margin-left 0.3s ease;
+    margin-bottom: 60px;
 }
 
 #playerContainer h3 {
+    text-align: center;
+    margin: 0 auto 1rem;
+    max-width: 80%;
     font-size: clamp(1.1rem, 5vw, 1.3rem);
     color: var(--text-primary);
-    margin-bottom: 1rem;
     padding-bottom: 0.75rem;
     border-bottom: 1px solid var(--border);
     font-weight: 600;
 }
 
-/* 底部音频控件 */
-#bottomAudioControls {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 0.75rem;
-    z-index: 90;
-    display: flex;
-    justify-content: center;
-    background-color: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.05);
-    backdrop-filter: blur(4px);
-}
-
-#bottomAudioControls audio {
-    width: 100%;
-    max-width: 100%;
-    border-radius: var(--radius);
-    background-color: rgba(255, 255, 255, 0.95);
-    border: 1px solid var(--border);
-    padding: 0.5rem;
-    transition: all 0.2s ease;
-}
-
-/* 文章阅读区域 - 核心适配：自动缩放字体 */
+/* Text Content */
 #text {
-    /* 关键：使用clamp实现字体自动缩放，最小1rem，最大1.15rem，基于屏幕宽度 */
     font-size: clamp(1rem, 4vw, 1.15rem);
     line-height: 1.8;
     color: var(--text-primary);
@@ -213,6 +220,7 @@ nav span {
     text-indent: 2em;
 }
 
+/* Sentence Highlighting */
 .sentence {
     display: inline;
     cursor: pointer;
@@ -236,6 +244,90 @@ nav span {
     margin: 0 1px;
 }
 
+/*******************************
+ * AUDIO CONTROLS
+ *******************************/
+
+/* Bottom Audio Controls */
+#bottomAudioControls {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 0.5rem;
+    z-index: 90;
+    display: flex;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(4px);
+    height: 60px;
+}
+
+#bottomAudioControls audio {
+    width: 100%;
+    max-width: 100%;
+    border-radius: var(--radius);
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 1px solid var(--border);
+    padding: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+/*******************************
+ * MOBILE MENU COMPONENTS
+ *******************************/
+
+/* Mobile Menu Toggle */
+.menu-toggle {
+    display: none;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1000;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.5rem;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: all 0.2s ease;
+}
+
+.menu-toggle:hover {
+    background: #2563eb;
+    transform: scale(1.05);
+}
+
+.menu-toggle:active {
+    transform: scale(0.95);
+}
+
+/* Backdrop Overlay */
+.backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.backdrop.show {
+    display: block;
+    opacity: 1;
+}
+
+/*******************************
+ * UTILITY CLASSES
+ *******************************/
+
+/* Loading State */
 .loading {
     color: var(--text-secondary);
     font-style: italic;
@@ -243,6 +335,7 @@ nav span {
     padding: 2rem 0;
 }
 
+/* Animations */
 @keyframes pulse {
     0% {
         box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.3);
@@ -255,7 +348,10 @@ nav span {
     }
 }
 
-/* 滚动条优化 */
+/*******************************
+ * SCROLLBAR STYLING
+ *******************************/
+
 ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
@@ -274,31 +370,89 @@ nav span {
     background: #94a3b8;
 }
 
-/* 平板/桌面端适配 */
+/*******************************
+ * RESPONSIVE DESIGN
+ *******************************/
+
+/* Tablet/Desktop Styles (768px and above) */
 @media (min-width: 768px) {
     .container {
         flex-direction: row;
-        padding: 0 1.5rem 1.5rem;
+        padding: 0 1.5rem;
         gap: 1.5rem;
     }
     
     #fileList {
         flex: 0 0 260px;
-        max-height: calc(100vh - 180px);
+        max-height: calc(100vh - 80px);
         padding: 1.25rem;
+        position: relative;
+        transform: none !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
     }
     
     #playerContainer {
-        padding: 2rem;
-        max-height: calc(100vh - 180px);
+        padding: 1.5rem;
+        max-height: calc(100vh - 80px);
+        margin-left: 0 !important;
+        margin-bottom: 60px;
     }
     
     #bottomAudioControls audio {
-        max-width: calc(1400px - 240px - 3rem);
+        max-width: calc(1400px - 240px - 2rem);
+    }
+    
+    .menu-toggle {
+        display: none !important;
     }
 }
 
-/* 大屏桌面端 */
+/* Mobile Styles (767px and below) */
+@media (max-width: 767px) {
+    .menu-toggle {
+        display: block;
+    }
+    
+    body {
+        padding-top: 3rem;
+    }
+    
+    #fileList {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 280px;
+        max-height: 100vh;
+        z-index: 999;
+        border-radius: 0;
+        box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+        padding-top: 3rem;
+    }
+    
+    #fileList.hidden {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    
+    #fileList h3 {
+        padding-top: 1rem;
+        margin-top: 0;
+    }
+    
+    #playerContainer {
+        padding-top: 2rem;
+        margin-bottom: 60px;
+    }
+    
+    #playerContainer h3 {
+        font-size: 1.1rem;
+        max-width: 90%;
+    }
+}
+
+/* Large Desktop Styles (1200px and above) */
 @media (min-width: 1200px) {
     #text {
         font-size: 1.15rem;

@@ -7,31 +7,30 @@
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <!-- 语言切换Tab栏 -->
-    <div class="language-tabs">
-        <div class="language-tab active" data-lang="english">Headline News</div>
-    </div>
-
-    <!-- 主容器 -->
+    <!-- 移动端菜单切换按钮 -->
+    <button class="menu-toggle" id="menuToggle">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </button>
+    
+    <!-- 移动端遮罩层 -->
+    <div class="backdrop" id="backdrop"></div>
+    
     <div class="container">
-        <!-- 左侧文件列表 -->
-        <div id="fileList">
-            <h3></h3>
+        <div id="fileList" class="hidden">
             <ul id="fileListItems"></ul>
         </div>
-        
-        <!-- 中间文章区域 -->
         <div id="playerContainer">
             <h3 id="articleTitle">请选择一篇文章开始播放...</h3>
             <div id="text" class="loading"></div>
         </div>
     </div>
-
-    <!-- 底部音频控件 -->
     <div id="bottomAudioControls">
         <audio id="audio" controls></audio>
     </div>
-
-    <script src="/static/script.js"></script>
 </body>
+<script src="/static/script.js"></script>
 </html>

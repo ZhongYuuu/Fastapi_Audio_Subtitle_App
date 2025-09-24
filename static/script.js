@@ -3,43 +3,62 @@ const fileListEl = document.getElementById('fileListItems');
 const audioEl = document.getElementById('audio');
 const textEl = document.getElementById('text');
 const articleTitleEl = document.getElementById('articleTitle');
-const languageTabs = document.querySelectorAll('.language-tab');
 let currentSentences = [];
 let currentSelectedFile = null;
 let currentLanguage = 'english'; // 默认语言
 const DOUBLE_CLICK_DELAY = 250;
 
 document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const langFromUrl = urlParams.get('lang');
-    if (langFromUrl && ['english', 'german', 'french', 'spanish'].includes(langFromUrl)) {
-        currentLanguage = langFromUrl;
-        updateActiveTab(currentLanguage);
-    }
+    // 移动端菜单切换功能
+    const menuToggle = document.getElementById('menuToggle');
+    const fileList = document.getElementById('fileList');
+    const backdrop = document.getElementById('backdrop');
     
     loadLanguageFiles(currentLanguage);
-    
-    languageTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const lang = tab.dataset.lang;
-            if (lang !== currentLanguage) {
-                currentLanguage = lang;
-                updateActiveTab(lang);
-                loadLanguageFiles(lang);
+
+    if (menuToggle && fileList && backdrop) {
+        function toggleMenu() {
+            fileList.classList.toggle('hidden');
+            backdrop.classList.toggle('show');
+        }
+        
+        menuToggle.addEventListener('click', toggleMenu);
+        
+        // 点击遮罩层隐藏菜单
+        backdrop.addEventListener('click', () => {
+            fileList.classList.add('hidden');
+            backdrop.classList.remove('show');
+        });
+        
+        // 点击文件列表项后自动隐藏菜单（移动端）
+        fileList.addEventListener('click', (e) => {
+            if (e.target.tagName === 'LI' && window.innerWidth <= 767) {
+                setTimeout(() => {
+                    fileList.classList.add('hidden');
+                    backdrop.classList.remove('show');
+                }, 300);
             }
         });
-    });
+        
+        // 点击主内容区域时隐藏菜单（移动端）
+        document.getElementById('playerContainer').addEventListener('click', () => {
+            if (window.innerWidth <= 767 && !fileList.classList.contains('hidden')) {
+                fileList.classList.add('hidden');
+                backdrop.classList.remove('show');
+            }
+        });
+        
+        // 窗口大小改变时的处理
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 767) {
+                fileList.classList.remove('hidden');
+                backdrop.classList.remove('show');
+            } else {
+                fileList.classList.add('hidden');
+            }
+        });
+    }
 });
-
-function updateActiveTab(lang) {
-    languageTabs.forEach(tab => {
-        if (tab.dataset.lang === lang) {
-            tab.classList.add('active');
-        } else {
-            tab.classList.remove('active');
-        }
-    });
-}
 
 function loadLanguageFiles(lang) {
     fileListEl.innerHTML = '<li class="loading">加载中...</li>';
