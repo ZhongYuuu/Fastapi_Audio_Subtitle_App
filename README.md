@@ -1,7 +1,4 @@
 
-
-安装py环境
-
 # run:
 - .venv\Scripts\activate
 - uvicorn main:app --port 3457 --reload
