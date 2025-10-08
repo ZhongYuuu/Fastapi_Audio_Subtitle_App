@@ -1,5 +1,6 @@
 
 
+安装py环境
 
 # run:
 - .venv\Scripts\activate
