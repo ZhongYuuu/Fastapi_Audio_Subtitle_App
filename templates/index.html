@@ -31,6 +31,22 @@
     <div id="bottomAudioControls">
         <audio id="audio" controls></audio>
     </div>
+    
+    <!-- 右侧记事本侧边栏 -->
+    <div id="notebookSidebar" class="notebook-sidebar">
+        <div class="notebook-header">
+            <h3>单词本</h3>
+            <button id="toggleNotebook" class="toggle-btn">✕</button>
+        </div>
+        <div class="notebook-content">
+            <textarea id="notebookText" placeholder="在此记录单词...
+每行一个单词"></textarea>
+            <button id="saveNotes" class="save-btn">保存</button>
+        </div>
+    </div>
+    
+    <!-- 记事本切换按钮 -->
+    <button id="openNotebook" class="open-notebook-btn">单词本</button>
 </body>
 <script src="/static/script.js"></script>
 </html>

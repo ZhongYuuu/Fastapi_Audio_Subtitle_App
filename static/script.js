@@ -199,14 +199,87 @@ audioEl.addEventListener('timeupdate', () => {
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Space' && document.activeElement.tagName !== 'INPUT') {
         e.preventDefault();
-        if (audioEl.src) {
-            if (audioEl.paused) {
-                audioEl.play().catch(err => {
-                    console.log('需要用户交互才能播放:', err);
-                });
-            } else {
-                audioEl.pause();
-            }
+        if (audioEl.paused) {
+            audioEl.play();
+        } else {
+            audioEl.pause();
         }
     }
 });
+
+// 记事本功能
+let currentArticle = null;
+const notebookSidebar = document.getElementById('notebookSidebar');
+const notebookText = document.getElementById('notebookText');
+const toggleNotebook = document.getElementById('toggleNotebook');
+const openNotebook = document.getElementById('openNotebook');
+const saveNotes = document.getElementById('saveNotes');
+
+// 打开记事本
+openNotebook.addEventListener('click', () => {
+    notebookSidebar.classList.add('open');
+    if (currentArticle) {
+        loadNotes();
+    }
+});
+
+// 关闭记事本
+toggleNotebook.addEventListener('click', () => {
+    notebookSidebar.classList.remove('open');
+});
+
+// 保存笔记
+saveNotes.addEventListener('click', async () => {
+    if (!currentArticle) {
+        alert('请先选择一篇文章');
+        return;
+    }
+    
+    const words = notebookText.value.split('\n').filter(word => word.trim());
+    
+    try {
+        const formData = new FormData();
+        words.forEach(word => formData.append('words', word.trim()));
+        
+        const response = await fetch(`/api/notes/${currentArticle}`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (response.ok) {
+            alert('保存成功！');
+        } else {
+            alert('保存失败，请重试');
+        }
+    } catch (error) {
+        console.error('保存笔记失败:', error);
+        alert('保存失败，请检查网络连接');
+    }
+});
+
+// 加载笔记
+async function loadNotes() {
+    if (!currentArticle) return;
+    
+    try {
+        const response = await fetch(`/api/notes/${currentArticle}`);
+        if (response.ok) {
+            const data = await response.json();
+            notebookText.value = data.words.join('\n');
+        }
+    } catch (error) {
+        console.error('加载笔记失败:', error);
+        notebookText.value = '';
+    }
+}
+
+// 修改selectFile函数以设置当前文章
+const originalSelectFile = selectFile;
+selectFile = function(name, element) {
+    currentArticle = name;
+    originalSelectFile(name, element);
+    // 如果记事本打开，加载对应笔记
+    if (notebookSidebar.classList.contains('open')) {
+        loadNotes();
+    }
+};

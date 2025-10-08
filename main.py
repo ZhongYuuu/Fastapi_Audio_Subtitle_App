@@ -5,6 +5,8 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 import os
 import re
+import json
+from typing import Dict, List
 
 app = FastAPI()
 # 获取项目根目录
@@ -15,6 +17,9 @@ app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
 # 服务端文件路径（支持多语言）
 LANGUAGE_DIR = os.path.join(BASE_DIR, "assets", "english")
+# 笔记本数据存储路径
+NOTEBOOK_DIR = BASE_DIR / "notebook_data"
+NOTEBOOK_DIR.mkdir(exist_ok=True)
 
 
 # ------------ 新增主页路由 ------------
@@ -110,3 +115,33 @@ def parse_srt_simple(srt_content):
         })
     
     return entries
+
+# ------------ 笔记本功能路由 ------------
+@app.get("/api/notes/{article_name}")
+def get_notes(article_name: str):
+    """获取指定文章的笔记"""
+    note_file = NOTEBOOK_DIR / f"{article_name}.json"
+    if note_file.exists():
+        with open(note_file, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {"words": []}
+
+@app.post("/api/notes/{article_name}")
+def save_notes(article_name: str, words: List[str] = Form(...)):
+    """保存指定文章的笔记"""
+    note_file = NOTEBOOK_DIR / f"{article_name}.json"
+    data = {"words": words}
+    with open(note_file, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    return {"status": "success"}
+
+@app.get("/api/all-notes")
+def get_all_notes():
+    """获取所有文章的笔记列表"""
+    notes = {}
+    for note_file in NOTEBOOK_DIR.glob("*.json"):
+        article_name = note_file.stem
+        with open(note_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            notes[article_name] = data["words"]
+    return notes
